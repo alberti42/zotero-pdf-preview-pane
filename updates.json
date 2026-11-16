@@ -23,6 +23,17 @@
               "strict_max_version": "10.0.*"
             }
           }
+        },
+        {
+          "version": "0.1.2",
+          "update_link": "https://github.com/alberti42/zotero-pdf-preview-pane/releases/download/v0.1.2/zotero-pdf-preview-pane-0.1.2.xpi",
+          "update_hash": "sha256:8c31d562ce7ddaf947cc708202794cbbad3296b605844bdf157d4ba0fc919f1f",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "7.0",
+              "strict_max_version": "10.0.*"
+            }
+          }
         }
       ]
     }
