@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-16
+
 ### Fixed
 
 - On a smaller screen the pane covered the whole item list: its height was a fixed number of pixels. The height is now a share, in percent, of the height that the item list and the pane share (preference `extensions.zotero-pdf-preview-pane.heightPercent`, default 50), and the item list keeps at least 100 px. The old preference `extensions.zotero-pdf-preview-pane.height` is removed.
@@ -34,7 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Double-click the PDF to open it in a reader tab, at the page shown.
 - View → Layout → PDF Preview Pane, or ⇧⌘P (Ctrl+Shift+P on Linux and Windows), shows or hides the pane.
 
-[Unreleased]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alberti42/zotero-pdf-preview-pane/releases/tag/v0.1.0
