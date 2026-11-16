@@ -66,6 +66,8 @@ var PDFViewer = {
       browser: null,
       spare: null,
       shownID: null,
+      // The reader still opening a PDF: { browser, reader }.
+      pending: null,
     };
 
     // Splitter and pane below the item list. The item list keeps flex 1;
@@ -130,6 +132,7 @@ var PDFViewer = {
     this.windows.delete(win);
     win.clearTimeout(s.timer);
     s.token++;
+    this.cancelPending(s);
     if (win.ZoteroPane?.itemSelected === s.itemSelected) {
       win.ZoteroPane.itemSelected = s.origItemSelected;
     }
@@ -188,6 +191,7 @@ var PDFViewer = {
       // Free the reader while the pane is hidden.
       s.win.clearTimeout(s.timer);
       s.token++;
+      this.cancelPending(s);
       this.releaseReader(s);
       s.spare?.remove();
       s.spare = null;
@@ -201,8 +205,13 @@ var PDFViewer = {
 
   // ── Following the selection ─────────────────────────────────────────
 
+  // A selection change closes the reader still opening the previous PDF at
+  // once, so that its parsing and drawing do not delay the next one. Zotero's
+  // own preview does the same (_processDiscard in attachmentPreview.js).
   scheduleUpdate(s) {
     if (s.pane.hidden) return;
+    s.token++;
+    this.cancelPending(s);
     s.win.clearTimeout(s.timer);
     s.timer = s.win.setTimeout(() => {
       this.update(s).catch((e) => Zotero.logError(e));
@@ -244,26 +253,29 @@ var PDFViewer = {
     // browser shown once the first page is drawn.
     const browser = s.spare || this.createBrowser(s);
     s.spare = null;
-    let reader = null;
+    const pending = { browser, reader: null };
+    s.pending = pending;
     let ok = false;
     try {
       await this.waitForReaderPage(browser);
       if (token === s.token) {
-        reader = await Zotero.Reader.openPreview(attachment.id, browser);
-        if (token === s.token) ok = await reader._open({});
+        pending.reader = await Zotero.Reader.openPreview(attachment.id, browser);
+        if (token === s.token) ok = await pending.reader._open({});
       }
     }
     catch (e) {
-      Zotero.logError(e);
+      // A reader closed by cancelPending() may throw; that is expected.
+      if (token === s.token) Zotero.logError(e);
     }
+    if (s.pending === pending) s.pending = null;
 
     if (token !== s.token || !ok) {
-      try { reader?.uninit(); } catch (e) {}
-      browser.remove();
+      this.discard(pending);
       if (token === s.token) this.showMessage(s, 'Zotero could not open the PDF');
       return;
     }
 
+    const reader = pending.reader;
     this.makeScrollable(reader);
     this.releaseReader(s);
     browser.style.visibility = '';
@@ -272,13 +284,31 @@ var PDFViewer = {
     s.shownID = attachment.id;
     s.message.hidden = true;
     // Load reader.html in a new spare browser for the next selection.
-    s.spare = this.createBrowser(s);
+    if (!s.spare) s.spare = this.createBrowser(s);
   },
 
   showMessage(s, text) {
     this.releaseReader(s);
     s.message.textContent = text;
     s.message.hidden = false;
+  },
+
+  cancelPending(s) {
+    if (!s.pending) return;
+    this.discard(s.pending);
+    s.pending = null;
+    // The discarded browser was the spare; load reader.html in a new one
+    // now, while the next update waits out DELAY_MS.
+    if (!s.spare) s.spare = this.createBrowser(s);
+  },
+
+  // Closes a reader that is opening or was given up, and removes its
+  // browser. Safe to call twice.
+  discard(pending) {
+    if (pending.discarded) return;
+    pending.discarded = true;
+    try { pending.reader?.uninit(); } catch (e) {}
+    pending.browser.remove();
   },
 
   releaseReader(s) {
@@ -308,6 +338,7 @@ var PDFViewer = {
 
   async waitForReaderPage(browser) {
     for (let i = 0; i < 200; i++) {
+      if (!browser.isConnected) throw new Error('The browser was removed');
       if (browser.contentDocument?.readyState === 'complete') return;
       await Zotero.Promise.delay(50);
     }
