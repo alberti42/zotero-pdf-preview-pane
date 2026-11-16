@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-16
+
+### Fixed
+
+- The pane showed no PDF: it called pdf.js's `PDFViewerApplication` by a wrong name, `PDFPreviewPaneApplication`, which the renaming in 0.1.0 had introduced. The pane kept the first message it showed, usually "No item selected".
+
 ## [0.1.0] - 2026-11-16
 
 ### Added
@@ -17,5 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Double-click the PDF to open it in a reader tab, at the page shown.
 - View → Layout → PDF Preview Pane, or ⇧⌘P (Ctrl+Shift+P on Linux and Windows), shows or hides the pane.
 
-[Unreleased]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alberti42/zotero-pdf-preview-pane/releases/tag/v0.1.0

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PDF Preview Pane",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shows the selected item's PDF in a pane below the item list, with continuous scrolling.",
   "author": "Andrea Alberti",
   "homepage_url": "https://github.com/alberti42/zotero-pdf-preview-pane",

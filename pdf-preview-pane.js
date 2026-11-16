@@ -87,7 +87,7 @@ var PDFPreviewPane = {
     s.splitter.setAttribute('resizeafter', 'closest');
 
     s.pane = doc.createXULElement('vbox');
-    s.pane.id = 'zotero-pdf-preview-pane-pane';
+    s.pane.id = 'zotero-pdf-preview-pane';
     s.pane.style.height = `${Zotero.Prefs.get(this.PREF_HEIGHT, true) || 450}px`;
     s.pane.style.minHeight = `${this.MIN_HEIGHT}px`;
 
@@ -386,7 +386,7 @@ var PDFPreviewPane = {
 
   makeScrollable(reader) {
     const pwin = reader._internalReader._primaryView._iframeWindow;
-    const viewer = pwin.PDFPreviewPaneApplication.pdfViewer;
+    const viewer = pwin.PDFViewerApplication.pdfViewer;
     pwin.removeEventListener('resize', reader.updatePDFAttr);
     const fit = () => {
       viewer.scrollMode = 0; // vertical, continuous
@@ -404,7 +404,7 @@ var PDFPreviewPane = {
     let location;
     try {
       const pwin = s.reader._internalReader._primaryView._iframeWindow;
-      location = { pageIndex: pwin.PDFPreviewPaneApplication.pdfViewer.currentPageNumber - 1 };
+      location = { pageIndex: pwin.PDFViewerApplication.pdfViewer.currentPageNumber - 1 };
     }
     catch (e) {}
     s.win.ZoteroPane.viewAttachment(s.shownID, event, false, { location });
