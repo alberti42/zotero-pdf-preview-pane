@@ -1,0 +1,19 @@
+{
+  "addons": {
+    "zotero-pdf-viewer@alberti42.github.io": {
+      "updates": [
+        {
+          "version": "0.1.0",
+          "update_link": "https://github.com/alberti42/zotero-pdf-viewer/releases/download/v0.1.0/zotero-pdf-viewer-0.1.0.xpi",
+          "update_hash": "sha256:f6993438ac6e85a900a5750d8709a0ce29c4963d69035499c4d4311d824f476f",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "7.0",
+              "strict_max_version": "10.0.*"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
