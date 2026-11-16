@@ -12,9 +12,11 @@ The repository, the plugin ID and the preferences were called `zotero-pdf-viewer
 | `bootstrap.js` | Zotero's entry points; loads `pdf-preview-pane.js` |
 | `pdf-preview-pane.js` | the pane |
 | `prefs.js` | default preferences `extensions.zotero-pdf-preview-pane.visible` and `.height` |
-| `build.sh` | builds `build/zotero-pdf-preview-pane-<version>.xpi` |
+| `build.sh` | builds `build/zotero-pdf-preview-pane-<version>.xpi`; the same commit gives the same bytes on any system |
+| `.github/workflows/release.yml` | on a pushed tag `vX.Y.Z`: builds the `.xpi`, checks it, attests it and creates the GitHub release |
 | `CHANGELOG.md` | changes per version, in the format of [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) |
 | `updates.json` | the update manifest Zotero reads from `update_url` in `manifest.json` |
+| `SECURITY.md` | how to report a vulnerability (GitHub private vulnerability reporting, enabled on the repository) and what the plugin reads, stores and sends; update it when the code starts reading, storing or sending something new |
 
 ## Releases
 
@@ -22,8 +24,12 @@ Versions follow [Semantic Versioning](https://semver.org/). To release version X
 
 1. Move the entries under `[Unreleased]` in `CHANGELOG.md` to a new section `[X.Y.Z] - <date>` and update the links at the end of the file.
 2. Set `version` in `manifest.json` to X.Y.Z and run `./build.sh`.
-3. Add an entry to `updates.json` with `update_link` `https://github.com/alberti42/zotero-pdf-preview-pane/releases/download/vX.Y.Z/zotero-pdf-preview-pane-X.Y.Z.xpi` and `update_hash` `sha256:<shasum -a 256 of that .xpi>`. Upload that same `.xpi`: a rebuilt one has different timestamps and a different hash.
-4. Commit, tag `vX.Y.Z`, push both, and create the GitHub release from the tag with the `.xpi` attached and the changelog section as notes.
+3. Add an entry to `updates.json` with `update_link` `https://github.com/alberti42/zotero-pdf-preview-pane/releases/download/vX.Y.Z/zotero-pdf-preview-pane-X.Y.Z.xpi` and `update_hash` `sha256:<shasum -a 256 of that .xpi>`.
+4. Commit, tag `vX.Y.Z` (annotated), and push the commit and the tag.
+
+The workflow `release.yml` then builds the `.xpi` again and stops without a release if the tag differs from `version` in `manifest.json`, or if `updates.json` has no entry for the version with that `update_link` and the SHA-256 of its build. It attests the `.xpi` with `actions/attest` and creates the release with the `.xpi` attached and the `CHANGELOG.md` section as notes. Do not create the release by hand.
+
+Releases 0.1.0 and 0.1.1 were built with `zip` before `build.sh` became reproducible and have no attestation; a build of their tags gives a different SHA-256 from the one in `updates.json`.
 
 ## Zotero facts the plugin depends on
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- GitHub Actions builds the `.xpi` of each release and attests its build provenance; `gh attestation verify` checks a downloaded `.xpi`.
+- `build.sh` is reproducible: the same commit gives the same `.xpi`, byte for byte. Files are stored uncompressed, so the `.xpi` is 17 KB instead of 6 KB.
+
 ## [0.1.1] - 2026-11-16
 
 ### Fixed

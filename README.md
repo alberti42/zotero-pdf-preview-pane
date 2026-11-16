@@ -23,6 +23,18 @@ You cannot select text in the pane: Zotero's preview reader draws no text layer.
 
 Zotero checks `updates.json` in this repository for new versions. `CHANGELOG.md` lists the changes in each version.
 
+From version 0.1.2, GitHub Actions builds the `.xpi` of each release and attests its build provenance. To check that a downloaded `.xpi` was built by this repository's workflow, run:
+
+```
+gh attestation verify zotero-pdf-preview-pane-<version>.xpi --repo alberti42/zotero-pdf-preview-pane
+```
+
+`build.sh` is reproducible: building the release's tag gives a file with the same SHA-256.
+
+## Privacy and security
+
+The plugin collects no information and sends nothing anywhere. [SECURITY.md](SECURITY.md) lists what it reads and stores, and how to report a security problem privately.
+
 ## Requirements
 
 Zotero 7 to 10. The plugin was tested on Zotero 10.0.9 on macOS. It contains no code specific to macOS.
