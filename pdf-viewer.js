@@ -16,9 +16,14 @@
 var PDFViewer = {
   PREF_VISIBLE: 'extensions.zotero-pdf-viewer.visible',
   PREF_HEIGHT: 'extensions.zotero-pdf-viewer.height',
-  // Pause after a selection change before the pane loads a PDF, so that
-  // holding ↓ does not load every paper on the way.
-  DELAY_MS: 150,
+  // While one of these keys repeats in the item list, the pane loads nothing,
+  // so that holding ↓ does not load every paper on the way; it loads the
+  // selected paper when the key is released. A pause after each selection
+  // change does not work: for a repeating ↑ or ↓ the item list reports the
+  // selection only after 100 ms without a repeat (_onSelectionChangeDebounced
+  // in libraryTree.js), and a load that slows the main thread creates such
+  // pauses.
+  REPEAT_KEYS: new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']),
   MIN_HEIGHT: 100,
   HTML_NS: 'http://www.w3.org/1999/xhtml',
 
@@ -58,7 +63,6 @@ var PDFViewer = {
 
     const s = {
       win,
-      timer: null,
       // Incremented by every update; an update that finds a newer token
       // after an await gives up.
       token: 0,
@@ -68,6 +72,11 @@ var PDFViewer = {
       shownID: null,
       // The reader still opening a PDF: { browser, reader }.
       pending: null,
+      // The selected item IDs, joined, that the PDF shown or loading is for;
+      // null after a message or a cancelled load.
+      target: null,
+      // True while a key in REPEAT_KEYS repeats in the item list.
+      repeating: false,
     };
 
     // Splitter and pane below the item list. The item list keeps flex 1;
@@ -120,7 +129,10 @@ var PDFViewer = {
 
     this.addMenuItem(s);
     s.onKeyDown = (event) => this.handleKeyDown(s, event);
+    s.onKeyUp = () => this.endRepeat(s);
     win.addEventListener('keydown', s.onKeyDown, true);
+    win.addEventListener('keyup', s.onKeyUp, true);
+    win.addEventListener('blur', s.onKeyUp);
 
     this.windows.set(win, s);
     this.applyVisibility(s);
@@ -130,13 +142,14 @@ var PDFViewer = {
     const s = this.windows.get(win);
     if (!s) return;
     this.windows.delete(win);
-    win.clearTimeout(s.timer);
     s.token++;
     this.cancelPending(s);
     if (win.ZoteroPane?.itemSelected === s.itemSelected) {
       win.ZoteroPane.itemSelected = s.origItemSelected;
     }
     win.removeEventListener('keydown', s.onKeyDown, true);
+    win.removeEventListener('keyup', s.onKeyUp, true);
+    win.removeEventListener('blur', s.onKeyUp);
     this.releaseReader(s);
     s.spare?.remove();
     s.menuItem?.remove();
@@ -165,8 +178,20 @@ var PDFViewer = {
     s.menuPopup.addEventListener('popupshowing', s.onPopupShowing);
   },
 
-  // ⇧⌘P (Ctrl+Shift+P on Linux and Windows) in the library tab.
+  // A repeating key in REPEAT_KEYS in the item list; ⇧⌘P (Ctrl+Shift+P on
+  // Linux and Windows) in the library tab.
   handleKeyDown(s, event) {
+    if (event.repeat && this.REPEAT_KEYS.has(event.key)
+        && event.target.closest?.('#zotero-items-tree')) {
+      if (!s.repeating) {
+        // Stop the load started by the first key press.
+        s.repeating = true;
+        s.token++;
+        this.cancelPending(s);
+        s.target = null;
+      }
+      return;
+    }
     const accel = Zotero.isMac ? event.metaKey : event.ctrlKey;
     if (!accel || !event.shiftKey || event.altKey) return;
     if (event.key.toLowerCase() !== 'p') return;
@@ -189,13 +214,21 @@ var PDFViewer = {
       this.scheduleUpdate(s);
     } else {
       // Free the reader while the pane is hidden.
-      s.win.clearTimeout(s.timer);
       s.token++;
       this.cancelPending(s);
       this.releaseReader(s);
+      s.target = null;
       s.spare?.remove();
       s.spare = null;
     }
+  },
+
+  // The key in REPEAT_KEYS was released, or the window lost focus: load the
+  // selected paper.
+  endRepeat(s) {
+    if (!s.repeating) return;
+    s.repeating = false;
+    this.scheduleUpdate(s);
   },
 
   saveHeight(s) {
@@ -205,17 +238,20 @@ var PDFViewer = {
 
   // ── Following the selection ─────────────────────────────────────────
 
-  // A selection change closes the reader still opening the previous PDF at
-  // once, so that its parsing and drawing do not delay the next one. Zotero's
-  // own preview does the same (_processDiscard in attachmentPreview.js).
+  // Loads the PDF for the selection at once, unless a key in REPEAT_KEYS is
+  // repeating or the selection is the one the PDF shown or loading is for
+  // (ZoteroPane also calls itemSelected() after every refresh of the list).
+  // A new selection closes the reader still opening the previous PDF, so
+  // that its parsing and drawing do not delay the next one. Zotero's own
+  // preview does the same (_processDiscard in attachmentPreview.js).
   scheduleUpdate(s) {
-    if (s.pane.hidden) return;
+    if (s.pane.hidden || s.repeating) return;
+    const target = s.win.ZoteroPane.getSelectedItems().map((item) => item.id).join(',');
+    if (target === s.target) return;
+    s.target = target;
     s.token++;
     this.cancelPending(s);
-    s.win.clearTimeout(s.timer);
-    s.timer = s.win.setTimeout(() => {
-      this.update(s).catch((e) => Zotero.logError(e));
-    }, this.DELAY_MS);
+    this.update(s).catch((e) => Zotero.logError(e));
   },
 
   // The PDF to show for the selection: the selected item itself if it is a
@@ -287,8 +323,11 @@ var PDFViewer = {
     if (!s.spare) s.spare = this.createBrowser(s);
   },
 
+  // Clears s.target, so that the next refresh of the list looks again, for
+  // example for a PDF added to the item.
   showMessage(s, text) {
     this.releaseReader(s);
+    s.target = null;
     s.message.textContent = text;
     s.message.hidden = false;
   },
@@ -298,7 +337,7 @@ var PDFViewer = {
     this.discard(s.pending);
     s.pending = null;
     // The discarded browser was the spare; load reader.html in a new one
-    // now, while the next update waits out DELAY_MS.
+    // now, so that it is ready for the next update.
     if (!s.spare) s.spare = this.createBrowser(s);
   },
 
