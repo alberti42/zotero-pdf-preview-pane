@@ -1,2 +1,2 @@
-pref("extensions.zotero-pdf-viewer.visible", true);
-pref("extensions.zotero-pdf-viewer.height", 450);
+pref("extensions.zotero-pdf-preview-pane.visible", true);
+pref("extensions.zotero-pdf-preview-pane.height", 450);

@@ -2,16 +2,16 @@
 
 A Zotero 7–10 plugin: a pane below the item list that shows the selected item's PDF with continuous scrolling. `README.md` describes what it does.
 
-The repository was called `zotero-pdf-viewer` until 2026-11-16; GitHub redirects the old URLs. The plugin ID `zotero-pdf-viewer@alberti42.github.io`, the preferences `extensions.zotero-pdf-viewer.*` and the element IDs `zotero-pdf-viewer-*` keep the old name: with a new plugin ID, Zotero would treat the plugin as a different one and not update installed copies, and new preference names would lose the settings people have.
+The repository, the plugin ID and the preferences were called `zotero-pdf-viewer` until 2026-11-16. GitHub redirects the old repository URLs.
 
 ## Files
 
 | Path | What it is |
 |---|---|
 | `manifest.json` | plugin ID, version, Zotero versions |
-| `bootstrap.js` | Zotero's entry points; loads `pdf-viewer.js` |
-| `pdf-viewer.js` | the pane |
-| `prefs.js` | default preferences `extensions.zotero-pdf-viewer.visible` and `.height` |
+| `bootstrap.js` | Zotero's entry points; loads `pdf-preview-pane.js` |
+| `pdf-preview-pane.js` | the pane |
+| `prefs.js` | default preferences `extensions.zotero-pdf-preview-pane.visible` and `.height` |
 | `build.sh` | builds `build/zotero-pdf-preview-pane-<version>.xpi` |
 | `CHANGELOG.md` | changes per version, in the format of [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) |
 | `updates.json` | the update manifest Zotero reads from `update_url` in `manifest.json` |

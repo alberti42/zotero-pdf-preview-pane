@@ -7,20 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- A selection change loads the PDF at once, without the pause of 150 ms. While ↑, ↓, Page Up or Page Down repeats in the item list, the pane loads nothing; it loads the selected paper when the key is released.
-- A refresh of the item list that leaves the selection unchanged no longer reloads the PDF.
-
-### Fixed
-
-- Moving through many items no longer stacks up PDF loads. A selection change closes the reader still opening the previous PDF, instead of letting it finish parsing and drawing.
-
 ## [0.1.0] - 2026-11-16
 
 ### Added
 
 - A pane below the item list that shows the selected item's PDF, with continuous scrolling and fit-to-width. It shows the item itself if it is a PDF attachment, otherwise its main attachment, and changes when the selection changes.
+- A selection change loads the PDF at once and closes the reader still opening the previous PDF. While ↑, ↓, Page Up or Page Down repeats in the item list, the pane loads nothing; it loads the selected paper when the key is released.
 - Drag the splitter above the pane to change its height. Zotero keeps the height.
 - Double-click the PDF to open it in a reader tab, at the page shown.
 - View → Layout → PDF Preview Pane, or ⇧⌘P (Ctrl+Shift+P on Linux and Windows), shows or hides the pane.

@@ -13,9 +13,9 @@
 // ReaderPreview is not part of Zotero's plugin API; check these after a major
 // Zotero update.
 
-var PDFViewer = {
-  PREF_VISIBLE: 'extensions.zotero-pdf-viewer.visible',
-  PREF_HEIGHT: 'extensions.zotero-pdf-viewer.height',
+var PDFPreviewPane = {
+  PREF_VISIBLE: 'extensions.zotero-pdf-preview-pane.visible',
+  PREF_HEIGHT: 'extensions.zotero-pdf-preview-pane.height',
   // While one of these keys repeats in the item list, the pane loads nothing,
   // so that holding ↓ does not load every paper on the way; it loads the
   // selected paper when the key is released. A pause after each selection
@@ -82,12 +82,12 @@ var PDFViewer = {
     // Splitter and pane below the item list. The item list keeps flex 1;
     // the pane has a fixed height, which the splitter changes.
     s.splitter = doc.createXULElement('splitter');
-    s.splitter.id = 'zotero-pdf-viewer-splitter';
+    s.splitter.id = 'zotero-pdf-preview-pane-splitter';
     s.splitter.setAttribute('resizebefore', 'closest');
     s.splitter.setAttribute('resizeafter', 'closest');
 
     s.pane = doc.createXULElement('vbox');
-    s.pane.id = 'zotero-pdf-viewer-pane';
+    s.pane.id = 'zotero-pdf-preview-pane-pane';
     s.pane.style.height = `${Zotero.Prefs.get(this.PREF_HEIGHT, true) || 450}px`;
     s.pane.style.minHeight = `${this.MIN_HEIGHT}px`;
 
@@ -166,7 +166,7 @@ var PDFViewer = {
     s.menuPopup = doc.querySelector('#layout-menu > menupopup');
     if (!s.menuPopup) return;
     s.menuItem = doc.createXULElement('menuitem');
-    s.menuItem.id = 'zotero-pdf-viewer-menuitem';
+    s.menuItem.id = 'zotero-pdf-preview-pane-menuitem';
     s.menuItem.setAttribute('label', 'PDF Preview Pane');
     s.menuItem.setAttribute('type', 'checkbox');
     s.menuItem.setAttribute('acceltext', Zotero.isMac ? '⇧⌘P' : 'Ctrl+Shift+P');
@@ -386,7 +386,7 @@ var PDFViewer = {
 
   makeScrollable(reader) {
     const pwin = reader._internalReader._primaryView._iframeWindow;
-    const viewer = pwin.PDFViewerApplication.pdfViewer;
+    const viewer = pwin.PDFPreviewPaneApplication.pdfViewer;
     pwin.removeEventListener('resize', reader.updatePDFAttr);
     const fit = () => {
       viewer.scrollMode = 0; // vertical, continuous
@@ -404,7 +404,7 @@ var PDFViewer = {
     let location;
     try {
       const pwin = s.reader._internalReader._primaryView._iframeWindow;
-      location = { pageIndex: pwin.PDFViewerApplication.pdfViewer.currentPageNumber - 1 };
+      location = { pageIndex: pwin.PDFPreviewPaneApplication.pdfViewer.currentPageNumber - 1 };
     }
     catch (e) {}
     s.win.ZoteroPane.viewAttachment(s.shownID, event, false, { location });

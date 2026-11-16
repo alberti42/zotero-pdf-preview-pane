@@ -7,5 +7,5 @@ version=$(python3 -I -c 'import json; print(json.load(open("manifest.json"))["ve
 xpi="build/zotero-pdf-preview-pane-$version.xpi"
 mkdir -p build
 rm -f "$xpi"
-zip -X -q "$xpi" manifest.json bootstrap.js prefs.js pdf-viewer.js
+zip -X -q "$xpi" manifest.json bootstrap.js prefs.js pdf-preview-pane.js
 echo "$xpi"
