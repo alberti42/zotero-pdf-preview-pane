@@ -2,6 +2,8 @@
 
 A Zotero 7–10 plugin: a pane below the item list that shows the selected item's PDF with continuous scrolling. `README.md` describes what it does.
 
+The repository was called `zotero-pdf-viewer` until 2026-11-16; GitHub redirects the old URLs. The plugin ID `zotero-pdf-viewer@alberti42.github.io`, the preferences `extensions.zotero-pdf-viewer.*` and the element IDs `zotero-pdf-viewer-*` keep the old name: with a new plugin ID, Zotero would treat the plugin as a different one and not update installed copies, and new preference names would lose the settings people have.
+
 ## Files
 
 | Path | What it is |
@@ -10,7 +12,7 @@ A Zotero 7–10 plugin: a pane below the item list that shows the selected item'
 | `bootstrap.js` | Zotero's entry points; loads `pdf-viewer.js` |
 | `pdf-viewer.js` | the pane |
 | `prefs.js` | default preferences `extensions.zotero-pdf-viewer.visible` and `.height` |
-| `build.sh` | builds `build/zotero-pdf-viewer-<version>.xpi` |
+| `build.sh` | builds `build/zotero-pdf-preview-pane-<version>.xpi` |
 | `CHANGELOG.md` | changes per version, in the format of [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) |
 | `updates.json` | the update manifest Zotero reads from `update_url` in `manifest.json` |
 
@@ -20,7 +22,7 @@ Versions follow [Semantic Versioning](https://semver.org/). To release version X
 
 1. Move the entries under `[Unreleased]` in `CHANGELOG.md` to a new section `[X.Y.Z] - <date>` and update the links at the end of the file.
 2. Set `version` in `manifest.json` to X.Y.Z and run `./build.sh`.
-3. Add an entry to `updates.json` with `update_link` `https://github.com/alberti42/zotero-pdf-viewer/releases/download/vX.Y.Z/zotero-pdf-viewer-X.Y.Z.xpi` and `update_hash` `sha256:<shasum -a 256 of that .xpi>`. Upload that same `.xpi`: a rebuilt one has different timestamps and a different hash.
+3. Add an entry to `updates.json` with `update_link` `https://github.com/alberti42/zotero-pdf-preview-pane/releases/download/vX.Y.Z/zotero-pdf-preview-pane-X.Y.Z.xpi` and `update_hash` `sha256:<shasum -a 256 of that .xpi>`. Upload that same `.xpi`: a rebuilt one has different timestamps and a different hash.
 4. Commit, tag `vX.Y.Z`, push both, and create the GitHub release from the tag with the `.xpi` attached and the changelog section as notes.
 
 ## Zotero facts the plugin depends on

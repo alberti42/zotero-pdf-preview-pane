@@ -18,7 +18,7 @@ You cannot select text in the pane: Zotero's preview reader draws no text layer.
 
 ## Install
 
-1. Download `zotero-pdf-viewer-<version>.xpi` from the [latest release](https://github.com/alberti42/zotero-pdf-viewer/releases/latest), or run `./build.sh`, which writes it to `build/`.
+1. Download `zotero-pdf-preview-pane-<version>.xpi` from the [latest release](https://github.com/alberti42/zotero-pdf-preview-pane/releases/latest), or run `./build.sh`, which writes it to `build/`.
 2. In Zotero, open Tools → Plugins, click the gear icon, choose "Install Plugin From File…" and pick the `.xpi`.
 
 Zotero checks `updates.json` in this repository for new versions. `CHANGELOG.md` lists the changes in each version.

@@ -25,5 +25,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Double-click the PDF to open it in a reader tab, at the page shown.
 - View → Layout → PDF Preview Pane, or ⇧⌘P (Ctrl+Shift+P on Linux and Windows), shows or hides the pane.
 
-[Unreleased]: https://github.com/alberti42/zotero-pdf-viewer/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/alberti42/zotero-pdf-viewer/releases/tag/v0.1.0
+[Unreleased]: https://github.com/alberti42/zotero-pdf-preview-pane/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/alberti42/zotero-pdf-preview-pane/releases/tag/v0.1.0
