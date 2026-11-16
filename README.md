@@ -4,6 +4,8 @@ A Zotero plugin that shows the selected item's PDF in a pane below the item list
 
 Zotero's own preview, in the Attachments section of the item pane, shows one page at a time and is as wide as the item pane.
 
+![The pane below the item list, showing the selected paper's PDF](screenshot.png)
+
 ## Use
 
 - The pane shows the PDF of the selected item: the item itself if it is a PDF attachment, otherwise its main attachment.
