@@ -11,7 +11,7 @@ The repository, the plugin ID and the preferences were called `zotero-pdf-viewer
 | `manifest.json` | plugin ID, version, Zotero versions |
 | `bootstrap.js` | Zotero's entry points; loads `pdf-preview-pane.js` |
 | `pdf-preview-pane.js` | the pane |
-| `prefs.js` | default preferences `extensions.zotero-pdf-preview-pane.visible` and `.height` |
+| `prefs.js` | default preferences `extensions.zotero-pdf-preview-pane.visible` and `.heightPercent` |
 | `build.sh` | builds `build/zotero-pdf-preview-pane-<version>.xpi`; the same commit gives the same bytes on any system |
 | `.github/workflows/release.yml` | on a pushed tag `vX.Y.Z`: builds the `.xpi`, checks it, attests it and creates the GitHub release |
 | `CHANGELOG.md` | changes per version, in the format of [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) |

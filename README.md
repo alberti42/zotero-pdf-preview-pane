@@ -10,7 +10,7 @@ Zotero's own preview, in the Attachments section of the item pane, shows one pag
 
 - The pane shows the PDF of the selected item: the item itself if it is a PDF attachment, otherwise its main attachment.
 - Scroll with the trackpad or mouse wheel over the pane.
-- Drag the splitter above the pane to change its height. Zotero keeps the height.
+- Drag the splitter above the pane to change its height. Zotero keeps its share of the height, so the pane fits a smaller screen too; the item list keeps at least 100 px.
 - Double-click the PDF to open it in a reader tab, at the page shown.
 - View → Layout → PDF Preview Pane, or ⇧⌘P (Ctrl+Shift+P on Linux and Windows), shows or hides the pane.
 

@@ -11,7 +11,7 @@ Security fixes go into a new release of the latest version. Older versions are n
 The plugin collects no information and sends nothing anywhere. Its code makes no network requests and contains no telemetry or analytics.
 
 - **Files it reads.** The PDF of the selected item, from Zotero's storage on your computer. Zotero's own preview reader (`ReaderPreview`) opens it; the plugin does not copy it.
-- **What it stores.** Two Zotero preferences in your Zotero profile: `extensions.zotero-pdf-preview-pane.visible` (whether the pane is shown) and `extensions.zotero-pdf-preview-pane.height` (its height in pixels).
+- **What it stores.** Two Zotero preferences in your Zotero profile: `extensions.zotero-pdf-preview-pane.visible` (whether the pane is shown) and `extensions.zotero-pdf-preview-pane.heightPercent` (its height in percent of the height that the item list and the pane share).
 - **Errors.** Errors go to Zotero's error log on your computer (Help → Report Errors…). They leave your computer only if you send a report to Zotero yourself.
 
 ## Network access by Zotero

@@ -15,7 +15,10 @@
 
 var PDFPreviewPane = {
   PREF_VISIBLE: 'extensions.zotero-pdf-preview-pane.visible',
-  PREF_HEIGHT: 'extensions.zotero-pdf-preview-pane.height',
+  // The pane's height in percent of the height that the item list and the
+  // pane share. A height in pixels did not fit a smaller screen: the pane
+  // kept its height and the item list got none.
+  PREF_HEIGHT_PERCENT: 'extensions.zotero-pdf-preview-pane.heightPercent',
   // While one of these keys repeats in the item list, the pane loads nothing,
   // so that holding ↓ does not load every paper on the way; it loads the
   // selected paper when the key is released. A pause after each selection
@@ -24,7 +27,10 @@ var PDFPreviewPane = {
   // in libraryTree.js), and a load that slows the main thread creates such
   // pauses.
   REPEAT_KEYS: new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown']),
+  // Smallest heights of the pane and of the item list, in pixels. If the
+  // two do not fit, the pane gets its minimum and the list the rest.
   MIN_HEIGHT: 100,
+  MIN_LIST_HEIGHT: 100,
   HTML_NS: 'http://www.w3.org/1999/xhtml',
 
   id: null,
@@ -37,6 +43,8 @@ var PDFPreviewPane = {
     this.id = id;
     this.version = version;
     this.rootURI = rootURI;
+    // Versions up to 0.1.2 stored the height in pixels under this name.
+    Zotero.Prefs.clear('extensions.zotero-pdf-preview-pane.height', true);
   },
 
   addToAllWindows() {
@@ -80,7 +88,9 @@ var PDFPreviewPane = {
     };
 
     // Splitter and pane below the item list. The item list keeps flex 1;
-    // the pane has a fixed height, which the splitter changes.
+    // applyHeight() sets the pane's height from PREF_HEIGHT_PERCENT whenever
+    // the container changes size, and the splitter changes it.
+    s.list = doc.getElementById('zotero-items-pane');
     s.splitter = doc.createXULElement('splitter');
     s.splitter.id = 'zotero-pdf-preview-pane-splitter';
     s.splitter.setAttribute('resizebefore', 'closest');
@@ -88,7 +98,6 @@ var PDFPreviewPane = {
 
     s.pane = doc.createXULElement('vbox');
     s.pane.id = 'zotero-pdf-preview-pane';
-    s.pane.style.height = `${Zotero.Prefs.get(this.PREF_HEIGHT, true) || 450}px`;
     s.pane.style.minHeight = `${this.MIN_HEIGHT}px`;
 
     // A stack draws its children on top of each other: the message, the
@@ -110,6 +119,10 @@ var PDFPreviewPane = {
     s.onSplitterRelease = () => this.saveHeight(s);
     s.splitter.addEventListener('command', s.onSplitterRelease);
     s.splitter.addEventListener('mouseup', s.onSplitterRelease);
+    // The container changes size with the window; a ResizeObserver also
+    // reports its first size once the window is laid out.
+    s.resizeObserver = new win.ResizeObserver(() => this.applyHeight(s));
+    s.resizeObserver.observe(container);
 
     // Double-click opens the PDF in a reader tab, at the page shown.
     s.onDblClick = (event) => this.openInTab(s, event);
@@ -150,6 +163,7 @@ var PDFPreviewPane = {
     win.removeEventListener('keydown', s.onKeyDown, true);
     win.removeEventListener('keyup', s.onKeyUp, true);
     win.removeEventListener('blur', s.onKeyUp);
+    s.resizeObserver.disconnect();
     this.releaseReader(s);
     s.spare?.remove();
     s.menuItem?.remove();
@@ -211,6 +225,7 @@ var PDFPreviewPane = {
     s.splitter.hidden = !visible;
     s.pane.hidden = !visible;
     if (visible) {
+      this.applyHeight(s);
       this.scheduleUpdate(s);
     } else {
       // Free the reader while the pane is hidden.
@@ -231,9 +246,43 @@ var PDFPreviewPane = {
     this.scheduleUpdate(s);
   },
 
+  // The height the item list and the pane share: the container's height
+  // minus that of its other children (toolbar, search pane, splitter).
+  sharedHeight(s) {
+    const container = s.pane.parentNode;
+    let others = 0;
+    for (const child of container.children) {
+      if (child !== s.pane && child !== s.list) others += child.getBoundingClientRect().height;
+    }
+    return container.clientHeight - others;
+  },
+
+  heightPercent() {
+    const percent = Zotero.Prefs.get(this.PREF_HEIGHT_PERCENT, true);
+    return Number.isInteger(percent) && percent > 0 && percent < 100 ? percent : 50;
+  },
+
+  applyHeight(s) {
+    if (s.pane.hidden) return;
+    const shared = this.sharedHeight(s);
+    if (shared <= 0) return; // not laid out yet
+    const height = Math.max(
+      this.MIN_HEIGHT,
+      Math.min(Math.round(shared * this.heightPercent() / 100), shared - this.MIN_LIST_HEIGHT),
+    );
+    s.pane.style.height = `${height}px`;
+    // The splitter may have given the item list a fixed height; the list
+    // keeps flex 1 and takes the rest.
+    s.list?.style.removeProperty('height');
+    s.list?.removeAttribute('height');
+  },
+
   saveHeight(s) {
-    const height = Math.round(s.pane.getBoundingClientRect().height);
-    if (height >= this.MIN_HEIGHT) Zotero.Prefs.set(this.PREF_HEIGHT, height, true);
+    const shared = this.sharedHeight(s);
+    if (shared <= 0) return;
+    const percent = Math.round(100 * s.pane.getBoundingClientRect().height / shared);
+    Zotero.Prefs.set(this.PREF_HEIGHT_PERCENT, Math.min(95, Math.max(5, percent)), true);
+    this.applyHeight(s);
   },
 
   // ── Following the selection ─────────────────────────────────────────

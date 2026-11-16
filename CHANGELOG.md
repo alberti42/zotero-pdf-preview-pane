@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- On a smaller screen the pane covered the whole item list: its height was a fixed number of pixels. The height is now a share, in percent, of the height that the item list and the pane share (preference `extensions.zotero-pdf-preview-pane.heightPercent`, default 50), and the item list keeps at least 100 px. The old preference `extensions.zotero-pdf-preview-pane.height` is removed.
+
 ## [0.1.2] - 2026-11-16
 
 ### Changed
