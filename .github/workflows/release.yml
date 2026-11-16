@@ -1,7 +1,8 @@
 # Release: runs when a tag vX.Y.Z is pushed. Builds the .xpi with build.sh,
 # checks it against manifest.json and updates.json, attests its build
-# provenance, and creates the GitHub release with the .xpi attached and the
-# CHANGELOG.md section of the version as notes.
+# provenance, and creates a draft GitHub release with the .xpi attached and
+# the CHANGELOG.md section of the version as notes. The maintainer reviews
+# the draft and publishes it.
 #
 # Verify a downloaded .xpi with:
 #   gh attestation verify zotero-pdf-preview-pane-X.Y.Z.xpi --repo alberti42/zotero-pdf-preview-pane
@@ -67,7 +68,7 @@ jobs:
         with:
           subject-path: ${{ env.XPI }}
 
-      - name: Create the release
+      - name: Create the draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -80,4 +81,4 @@ jobs:
               sys.exit(f'::error::CHANGELOG.md has no section for {version}')
           print(m.group(1).strip())
           EOF
-          gh release create "$GITHUB_REF_NAME" "$XPI" --title "$VERSION" --notes-file notes.md --verify-tag
+          gh release create "$GITHUB_REF_NAME" "$XPI" --title "$VERSION" --notes-file notes.md --verify-tag --draft

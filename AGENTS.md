@@ -27,7 +27,9 @@ Versions follow [Semantic Versioning](https://semver.org/). To release version X
 3. Add an entry to `updates.json` with `update_link` `https://github.com/alberti42/zotero-pdf-preview-pane/releases/download/vX.Y.Z/zotero-pdf-preview-pane-X.Y.Z.xpi` and `update_hash` `sha256:<shasum -a 256 of that .xpi>`.
 4. Commit, tag `vX.Y.Z` (annotated), and push the commit and the tag.
 
-The workflow `release.yml` then builds the `.xpi` again and stops without a release if the tag differs from `version` in `manifest.json`, or if `updates.json` has no entry for the version with that `update_link` and the SHA-256 of its build. It attests the `.xpi` with `actions/attest` and creates the release with the `.xpi` attached and the `CHANGELOG.md` section as notes. Do not create the release by hand.
+The workflow `release.yml` then builds the `.xpi` again and stops without a release if the tag differs from `version` in `manifest.json`, or if `updates.json` has no entry for the version with that `update_link` and the SHA-256 of its build. It attests the `.xpi` with `actions/attest` and creates a **draft** release with the `.xpi` attached and the `CHANGELOG.md` section as notes. Do not create the release by hand.
+
+5. Andrea reviews the draft on GitHub (Releases → the draft → Edit) and publishes it. Until then the `.xpi` cannot be downloaded, and Zotero installs that see the new version in `updates.json` on `main` fail to download it and try again at their next update check.
 
 Releases 0.1.0 and 0.1.1 were built with `zip` before `build.sh` became reproducible and have no attestation; a build of their tags gives a different SHA-256 from the one in `updates.json`.
 
